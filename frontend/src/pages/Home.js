@@ -1,34 +1,29 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { getBooks } from "../api";
+import { getCover } from "../data/books";
 
 function Home() {
-  const reviews = [
-    { id: "1", title: "Atomic Habits", review: "Great book about habits!", author: "James Clear" },
-    { id: "2", title: "The Alchemist", review: "A classic with deep lessons.", author: "Paulo Coelho" },
-  ];
+  const [books, setBooks] = useState([]);
+  useEffect(() => { getBooks().then(setBooks).catch(() => setBooks([])); }, []);
 
   return (
     <div className="container">
-      <h2>Book Reviews</h2>
-      {reviews.map((book) => (
-        <div className="card" key={book.id}>
-          <h3>{book.title}</h3>
-          <p>{book.review}</p>
-          <p><em>- {book.author}</em></p>
-
-          {/* Action Buttons */}
-          <div style={{ marginTop: "10px" }}>
-            <Link to={`/edit/${book.id}`} className="btn">✏️ Edit</Link>
-            <button
-              className="btn danger"
-              onClick={() => alert(`Deleted review: ${book.title}`)}
-              style={{ marginLeft: "10px" }}
-            >
-              🗑️ Delete
-            </button>
-          </div>
-        </div>
-      ))}
+      <h2 style={{ marginBottom: 20 }}>Browse Books</h2>
+      <div className="grid">
+        {books.map(b => (
+          <Link key={b.id} to={`/review/${b.id}`} className="book-card">
+            <img className="book-cover" src={getCover(b.cover)} alt={`${b.title} cover`} />
+            <div className="book-meta">
+              <h3 className="book-title">{b.title}</h3>
+              <p className="book-author">{b.author}</p>
+              {b.avg_rating
+                ? <p className="muted">⭐ {b.avg_rating} ({b.ratings_count})</p>
+                : <p className="muted">No ratings</p>}
+            </div>
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }

@@ -1,11 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-
-// Dummy reviews (later you’ll fetch from backend)
-const dummyReviews = [
-  { id: "1", title: "Atomic Habits", review: "Great book about habits!", author: "James Clear" },
-  { id: "2", title: "The Alchemist", review: "A classic with deep lessons.", author: "Paulo Coelho" },
-];
+import { getBook, updBook } from "../api";
 
 function EditReview() {
   const { id } = useParams();
@@ -13,39 +8,63 @@ function EditReview() {
   const [title, setTitle] = useState("");
   const [review, setReview] = useState("");
   const [author, setAuthor] = useState("");
+  const [year, setYear] = useState("");
+  const [genre, setGenre] = useState("");
+  const [cover, setCover] = useState("");
 
-  // Load the review based on ID
   useEffect(() => {
-    const book = dummyReviews.find((item) => item.id === id);
-    if (book) {
-      setTitle(book.title);
-      setReview(book.review);
-      setAuthor(book.author);
-    }
+    getBook(id).then(b => {
+      if (!b || b.error) return;
+      setTitle(b.title || "");
+      setAuthor(b.author || "");
+      setYear(b.year || "");
+      setGenre(b.genre || "");
+      setCover(b.cover || "");
+      setReview(b.description || "");
+    });
   }, [id]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Updated Review:", { id, title, review, author });
-    alert("Review updated successfully!");
-    navigate("/"); // send back to home after editing
+    await updBook(id, {
+      title, author,
+      year: Number(year) || null,
+      genre, cover,
+      description: review
+    });
+    alert("Book updated!");
+    navigate(`/review/${id}`);
   };
 
   return (
     <div className="container">
       <div className="card">
-        <h2>Edit Review</h2>
+        <h2>Edit Book</h2>
         <form onSubmit={handleSubmit}>
-          <label>Book Title</label>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} required />
-
-          <label>Review</label>
-          <textarea value={review} onChange={(e) => setReview(e.target.value)} required />
+          <label>Title</label>
+          <input value={title} onChange={e=>setTitle(e.target.value)} required/>
 
           <label>Author</label>
-          <input value={author} onChange={(e) => setAuthor(e.target.value)} required />
+          <input value={author} onChange={e=>setAuthor(e.target.value)} required/>
 
-          <button type="submit">Update Review</button>
+          <div style={{ display:"flex", gap:12 }}>
+            <div style={{ flex:1 }}>
+              <label>Year</label>
+              <input type="number" value={year} onChange={e=>setYear(e.target.value)}/>
+            </div>
+            <div style={{ flex:1 }}>
+              <label>Genre</label>
+              <input value={genre} onChange={e=>setGenre(e.target.value)}/>
+            </div>
+          </div>
+
+          <label>Cover (/covers/...)</label>
+          <input value={cover} onChange={e=>setCover(e.target.value)}/>
+
+          <label>Review / Description</label>
+          <textarea value={review} onChange={e=>setReview(e.target.value)} rows={4}/>
+
+          <button type="submit" className="btn" style={{ marginTop: 10 }}>Update</button>
         </form>
       </div>
     </div>
