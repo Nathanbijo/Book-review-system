@@ -154,3 +154,540 @@ body {
   .book-details .details-hero { flex-direction: column; align-items: flex-start; }
   .details-cover { width: 100%; height: 280px; }
 }
+/* ===== Centered details page aesthetic ===== */
+.details-card { padding: 24px; }
+
+.details-header {
+  text-align: center;
+  margin-bottom: 10px;
+}
+.details-title {
+  font-size: 2rem;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+.details-meta {
+  color: #64748b;
+}
+
+/* Centered cover with rating beneath */
+.details-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0 10px;
+}
+.details-cover-large {
+  width: 260px;
+  height: 360px;
+  object-fit: cover;
+  border-radius: 14px;
+  box-shadow: 0 12px 24px rgba(2,6,23,.15);
+  background: #e8edf5;
+}
+.details-rating {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 4px;
+}
+.details-rating-sub {
+  font-size: .9rem;
+  color: #475569;
+}
+
+.details-about { margin-top: 18px; }
+.details-about h3 { margin-bottom: 6px; }
+
+/* Review form */
+.details-form { margin-top: 20px; }
+.form-row { display: flex; gap: 12px; margin-bottom: 12px; }
+.form-col { flex: 1; }
+.form-col.full { flex: 1 1 100%; }
+.details-form label { font-weight: 600; color: #334155; display: block; margin-bottom: 4px; }
+.details-form input,
+.details-form textarea {
+  width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem;
+  background: #fff;
+}
+.details-form textarea { resize: vertical; }
+
+/* Review list */
+.details-reviews { margin-top: 18px; }
+.review-list { list-style: none; padding-left: 0; margin: 0; display: grid; gap: 12px; }
+.review-item {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+.review-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.review-user { color: #475569; }
+.review-text { color: #334155; }
+.review-date { color: #94a3b8; font-size: 0.8rem; margin-top: 4px; }
+
+/* Stars (already present; ensure looks nice centered) */
+.stars { display: inline-flex; align-items: center; gap: 4px; }
+.star { font-size: 24px; line-height: 1; background: transparent; border: none; cursor: pointer; opacity: .5; }
+.star.active { opacity: 1; }
+.star:hover { transform: scale(1.08); }
+.star:focus { outline: 2px solid #93c5fd; border-radius: 4px; }
+.stars-label { margin-left: 8px; font-size: .9rem; color: #475569; }
+
+@media (max-width: 640px) {
+  .details-cover-large { width: 100%; height: 420px; }
+  .form-row { flex-direction: column; }
+}
+/* ===== Pastel background via CSS var ===== */
+body {
+  background-color: var(--page-bg, #f5f7fa);
+}
+
+/* stronger title pop */
+.pop { font-weight: 800; letter-spacing: 0.2px; }
+
+/* ===== Details page layout (floating hero) ===== */
+.details-shell { position: relative; }
+
+.details-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-top: 8px;
+  margin-bottom: 10px;
+}
+
+.details-banner-left {
+  text-align: center;
+  flex: 1;
+}
+
+.details-title {
+  font-size: 2.2rem;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+.details-meta { color: #64748b; margin-bottom: 6px; }
+
+/* Stars theme: orange only in the sections that use .orange-stars */
+.orange-stars .star.active { color: #f97316; }           /* orange-500 */
+.orange-stars .star { color: #f97316; opacity: 0.35; }   /* off state */
+.orange-stars .stars-label { color: #f97316; }
+
+/* Floating cover above the card */
+.floating-hero {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+  margin-bottom: -70px; /* pulls the next card up to touch the bottom of the cover */
+  pointer-events: none; /* cover is decorative; clicks go through */
+}
+
+.details-cover-float {
+  width: 280px;
+  height: 400px;
+  object-fit: cover;
+  border-radius: 16px;
+  box-shadow: 0 18px 36px rgba(2,6,23,.18);
+  background: #e8edf5;
+}
+
+/* Main card looks lifted and starts "under" the cover bottom edge */
+.details-card.lifted {
+  padding-top: 24px;
+}
+
+/* Review form & list (minor tweaks retained) */
+.italic { font-style: italic; }
+
+.review-list { list-style: none; padding-left: 0; margin: 0; display: grid; gap: 12px; }
+.review-item {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 14px 14px 14px;
+  position: relative;
+}
+.review-date { color: #94a3b8; font-size: 0.82rem; margin-bottom: 6px; }
+.review-text { color: #334155; margin: 2px 0 6px; }
+.review-user { color: #475569; }
+
+/* place the review's stars at the top-right for a tidy card */
+.review-stars { position: absolute; right: 12px; top: 10px; }
+
+/* Buttons */
+.btn.gray {
+  background: #e5e7eb;
+  color: #111827;
+}
+.btn.gray:hover { background: #d1d5db; }
+
+/* Navbar brand link reset */
+.brand-link { text-decoration: none; }
+/* Remove the old blue navbar (we no longer render .navbar). New header: */
+.site-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 14px 12px;
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+.brand-logo { width: 28px; height: 28px; object-fit: contain; }
+.brand-text { color: #0f172a; font-size: 1.35rem; font-weight: 800; letter-spacing: .2px; }
+
+/* Position icons on top right without affecting the center layout */
+.page-actions {
+  position: absolute;
+  right: 24px;
+  top: 18px;   /* sits near the top edge */
+  display: flex;
+  gap: 8px;
+  z-index: 5;
+}
+.icon-btn {
+  width: 36px; height: 36px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 10px;
+  background: #2563eb; color: #fff; text-decoration: none;
+  box-shadow: 0 2px 6px rgba(37,99,235,.24);
+}
+.icon-btn.danger { background: #dc2626; box-shadow: 0 2px 6px rgba(220,38,38,.24); }
+.icon-btn:hover { filter: brightness(0.95); }
+
+/* Centered banner */
+.details-banner {
+  text-align: center;
+  margin-top: 6px;
+  margin-bottom: 8px;
+}
+.details-title { font-size: 2.4rem; margin: 0; }
+.details-meta { color: #64748b; margin-top: 6px; margin-bottom: 6px; }
+
+/* Ensure floating cover stays above card while scrolling */
+.floating-hero { display: flex; justify-content: center; position: relative; z-index: 3; }
+.details-cover-float {
+  width: 280px; height: 400px; object-fit: cover;
+  border-radius: 16px; box-shadow: 0 18px 36px rgba(2,6,23,.18);
+  background: #e8edf5;
+}
+/* Push the main card down enough so the cover bottom never gets hidden */
+.details-card.no-overlap { margin-top: -60px; padding-top: 120px; position: relative; z-index: 2; }
+
+/* Orange star theme kept */
+.orange-stars .star.active { color: #f97316; }
+.orange-stars .star { color: #f97316; opacity: .35; }
+.orange-stars .stars-label { color: #f97316; }
+
+/* Bigger review text */
+.review-text.bigger { font-size: 1.06rem; }
+
+/* Body pastel background variable already present earlier in your CSS */
+/* --- Global font bump for the whole app --- */
+html { font-size: 18px; }            /* was 16px; gentle, app-wide increase */
+body { background-color: var(--page-bg, #f6f6f6); }
+
+/* Header centered, bigger brand */
+.site-header.center-header { justify-content: center; }
+.brand-logo.lg { width: 48px; height: 48px; }     /* bigger logo */
+.brand-text.xl { font-size: 2rem; }               /* site name largest, above book title */
+
+/* Vertically stacked book header (center of page) */
+.details-banner.vstack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  margin-top: 6px;
+  margin-bottom: 10px;
+}
+.details-title { font-size: 2.2rem; }            /* book title smaller than site title */
+.details-meta { color: #64748b; }
+
+/* Floating cover + floating action icons (no layout impact) */
+.cover-wrap { position: relative; }
+.cover-actions {
+  position: absolute;
+  right: -64px;            /* floats to the right edge of cover */
+  top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 6;              /* above cover */
+}
+.icon-btn {
+  width: 42px; height: 42px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 12px;
+  background: #2563eb; color: #fff; text-decoration: none;
+  box-shadow: 0 3px 8px rgba(37,99,235,.25);
+  font-size: 1.1rem;
+}
+.icon-btn.danger { background: #dc2626; box-shadow: 0 3px 8px rgba(220,38,38,.25); }
+.icon-btn:hover { filter: brightness(0.96); }
+
+/* Ensure the book cover never gets hidden by the card as you scroll */
+.details-card.no-overlap { margin-top: -60px; padding-top: 130px; position: relative; z-index: 2; }
+
+/* Orange star theme remains */
+.orange-stars .star.active { color: #f97316; }
+.orange-stars .star { color: #f97316; opacity: .35; }
+.orange-stars .stars-label { color: #f97316; }
+
+/* Review text bigger, already italic via class */
+.review-text.bigger { font-size: 1.1rem; line-height: 1.6; }
+
+/* Responsive: if screen is narrow, tuck icons closer */
+@media (max-width: 900px) {
+  .cover-actions { right: -50px; }
+}
+@media (max-width: 720px) {
+  .cover-actions { right: 0; top: -54px; flex-direction: row; }
+  .icon-btn { width: 36px; height: 36px; }
+}
+/* =========  TYPOGRAPHY SYSTEM (uniform, scalable)  ========= */
+
+/* 1) One place to tune font sizes */
+:root{
+  --ff-sans: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+
+  /* Base size + scale */
+  --fs-base: 18px;           /* overall body size; change this to scale everything */
+  --lh-base: 1.6;
+
+  /* Section scale (relative to base) */
+  --fs-display: 2.6rem;      /* Site title (WordWave) */
+  --fs-h1:      2.0rem;      /* Book title */
+  --fs-h2:      1.35rem;     /* Section headings: “About this book”, “Add your review”, … */
+  --fs-h3:      1.25rem;     /* Subheads / small titles */
+  --fs-body:    0.9rem;        /* Body text, inputs, buttons */
+  --fs-muted:   0.95rem;     /* Dates, helper text */
+  --fs-small:   0.9rem;      /* Fine print */
+
+  /* Star/icon size */
+  --fs-stars:   1.05rem;
+
+  /* Font weights */
+  --fw-regular: 400;
+  --fw-medium:  500;
+  --fw-semibold:600;
+  --fw-bold:    700;
+}
+
+html { font-size: var(--fs-base); }
+body { font-family: var(--ff-sans); line-height: var(--lh-base); }
+
+/* 2) Globals */
+h1, h2, h3 { color:#0f172a; letter-spacing: .2px; }
+h1 { font-size: var(--fs-h1); font-weight: var(--fw-bold); line-height: 1.25; }
+h2 { font-size: var(--fs-h2); font-weight: var(--fw-semibold); margin: 1.25rem 0 .75rem; }
+h3 { font-size: var(--fs-h3); font-weight: var(--fw-semibold); margin: 1rem 0 .5rem; }
+
+p, li, label, input, textarea, button, a, span { font-size: var(--fs-body); }
+
+/* Site header (WordWave) */
+.site-brand { font-size: var(--fs-display); font-weight: var(--fw-bold); }
+
+/* Book title (big but smaller than brand) */
+.book-title { font-size: var(--fs-h1); font-weight: var(--fw-bold); }
+
+/* Small helpers */
+.muted, .date { font-size: var(--fs-muted); color:#475569; }
+.small { font-size: var(--fs-small); }
+
+/* 3) Form elements */
+input[type="text"], textarea {
+  font-size: var(--fs-body);
+  line-height: 1.5;
+}
+button, .btn {
+  font-size: var(--fs-body);
+  line-height: 1.3;
+}
+
+/* 4) Reviews */
+.review-text { font-size: var(--fs-body); font-style: italic; }
+.review-author { font-size: var(--fs-body); font-style: italic; color:#334155; }
+.review-date { font-size: var(--fs-muted); }
+
+/* 5) Stars (text or SVG icons) */
+.stars, .stars span, .stars svg { font-size: var(--fs-stars); }
+
+/* 6) Responsive nudge: slightly reduce on narrow screens */
+@media (max-width: 640px){
+  :root{
+    --fs-base: 16px;
+    --fs-display: 2.2rem;
+    --fs-h1: 1.7rem;
+    --fs-h2: 1.25rem;
+    --fs-stars: 1.05rem;
+  }
+}
+/* ===== Dynamic star colors (filled vs empty) ===== */
+/* Base fallback */
+.stars .star { color: #d1d5db; opacity: 1; }           /* empty */
+.stars .star.active { color: #f59e0b; }                /* filled amber */
+
+/* Orange theme used on book page + reviews */
+.orange-stars .star { color: #fde1cf; }                /* empty (peachy) */
+.orange-stars .star.active { color: #f97316; }         /* filled (orange) */
+/* ===== Grayscale floating action buttons ===== */
+.icon-btn {
+  background: #9ca3af;               /* gray-400 */
+  color: #111827;
+  box-shadow: 0 3px 8px rgba(0,0,0,.12);
+}
+.icon-btn.danger { background: #6b7280; color: #111827; } /* gray-500 */
+.icon-btn:hover { filter: brightness(0.95); }
+/* ===== About text size bump ===== */
+.details-about p { font-size: 1.05rem; }  /* was ~1.0rem */
+/* ===== Stylish card look ===== */
+.card.stylish {
+  /* soft glassy panel */
+  background:
+    radial-gradient(1200px 300px at 50% -120px, rgba(250,250,255,.7), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.95));
+  border: 1px solid rgba(226, 232, 240, .9);        /* slate-200 */
+  border-radius: 16px;
+  box-shadow:
+    0 10px 20px rgba(2, 6, 23, .08),
+    0 2px 6px rgba(2, 6, 23, .06);
+  backdrop-filter: blur(4px);
+  position: relative;
+}
+
+/* top edge highlight for a premium feel */
+.card.stylish::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, #f0f9ff, #e2e8f0, #f0f9ff);
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  opacity: .8;
+}
+
+/* subtle inner border to define edges on light backgrounds */
+.card.stylish::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgba(148,163,184,.25);
+}
+/* ===== Section banners (About / Add review / What readers say) ===== */
+.section-banner,
+.details-about h3,
+.details-form h3,
+.details-reviews h3 {
+  position: relative;
+  display: block;
+  padding: 10px 14px;
+  margin: 18px 0 10px;
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.95));
+  border: 1px solid rgba(226,232,240,.9); /* slate-200 */
+  box-shadow:
+    0 3px 8px rgba(2,6,23,.06),
+    inset 0 0 0 1px rgba(148,163,184,.16);
+  font-size: var(--fs-h2, 1.35rem);
+  color: #0f172a;
+}
+
+/* colored accent chip at the left */
+.section-banner::before,
+.details-about h3::before,
+.details-form h3::before,
+.details-reviews h3::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px; height: 8px;
+  border-radius: 999px;
+  background: #f97316; /* orange accent */
+  box-shadow: 0 0 0 6px rgba(249,115,22,.12);
+}
+
+/* subtle divider line after each banner */
+.section-divider,
+.details-about + .details-form,
+.details-form + .details-reviews {
+  border-top: 1px dashed #e2e8f0;
+  margin-top: 14px;
+  padding-top: 14px;
+}
+/* ===== Ensure cover actions are clickable ===== */
+.floating-hero { pointer-events: auto; z-index: 10; }   /* parent allows events */
+.details-cover-float { pointer-events: none; }          /* image itself ignores clicks */
+.cover-actions { pointer-events: auto; z-index: 25; }   /* buttons get the events */
+.icon-btn { cursor: pointer; }
+.details-about p { font-size: calc(var(--fs-body, 1rem) + .06rem); }
+/* Kill the orange bullet accent on section headers */
+.section-banner::before,
+.details-about h3::before,
+.details-form h3::before,
+.details-reviews h3::before { display: none !important; }
+.titlecard-stripe{
+  border-radius:16px;
+  border:1px solid rgba(226,232,240,.9);
+  background:#fff;
+  position:relative;
+  box-shadow: 0 10px 20px rgba(2,6,23,.08);
+}
+.titlecard-stripe::before{
+  content:"";
+  position:absolute; inset:0 0 auto 0; height:10px; border-radius:16px 16px 0 0;
+  background: linear-gradient(90deg, var(--stripe-a,#fde68a), var(--stripe-b,#e9d5ff), var(--stripe-c,#fecaca));
+  opacity:.9;
+}
+/* optional: derive stripes from the same pastel hue (set once per page) */
+:root{
+  --stripe-a: color-mix(in oklab, var(--page-bg, #fff) 20%, #f97316);
+  --stripe-b: color-mix(in oklab, var(--page-bg, #fff) 20%, #6366f1);
+  --stripe-c: color-mix(in oklab, var(--page-bg, #fff) 20%, #06b6d4);
+}
+/* === Plain, bold section headings (no bars/dots) === */
+.details-about h3,
+.details-form h3,
+.details-reviews h3,
+.section-title {
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 18px 0 10px !important;
+  font-weight: 800 !important;   /* bolder */
+  color: #0f172a !important;
+  font-size: var(--fs-h2, 1.35rem) !important;
+}
+
+/* remove any decorative bullets/lines we added earlier */
+.details-about h3::before,
+.details-form h3::before,
+.details-reviews h3::before,
+.section-title::before,
+.section-title::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* === Darker, solid section separators === */
+.details-about + .details-form,
+.details-form + .details-reviews,
+.section-divider {
+  border-top: 1px solid #cbd5e1 !important;  /* slate-300 */
+  margin-top: 16px !important;
+  padding-top: 16px !important;
+}

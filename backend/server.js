@@ -15,18 +15,19 @@ const db = new Database(dbPath);
 // helper: book with avg rating + count
 const bookWithAgg = db.prepare(`
 SELECT b.*,
-       (SELECT ROUND(AVG(stars),1) FROM ratings r WHERE r.book_id=b.id) AS avg_rating,
-       (SELECT COUNT(*) FROM ratings r WHERE r.book_id=b.id) AS ratings_count
+       (SELECT ROUND(AVG(stars),1) FROM reviews r WHERE r.book_id=b.id) AS avg_rating,
+       (SELECT COUNT(*) FROM reviews r WHERE r.book_id=b.id) AS ratings_count
 FROM books b WHERE b.id = ?`);
+
 
 // ROUTES
 app.get('/books', (req, res) => {
   const rows = db.prepare(`
-    SELECT b.*,
-           (SELECT ROUND(AVG(stars),1) FROM ratings r WHERE r.book_id=b.id) AS avg_rating,
-           (SELECT COUNT(*) FROM ratings r WHERE r.book_id=b.id) AS ratings_count
-    FROM books b
-    ORDER BY b.id DESC
+   SELECT b.*,
+       (SELECT ROUND(AVG(stars),1) FROM reviews r WHERE r.book_id=b.id) AS avg_rating,
+       (SELECT COUNT(*) FROM reviews r WHERE r.book_id=b.id) AS ratings_count
+FROM books b
+ORDER BY b.id DESC
   `).all();
   res.json(rows);
 });
@@ -72,3 +73,36 @@ app.post('/books/:id/rate', (req, res) => {
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`API ready → http://localhost:${PORT}`));
+// List reviews for a book (new)
+app.get('/books/:id/reviews', (req, res) => {
+  const rows = db.prepare(`
+    SELECT id, username, stars, text, created_at
+    FROM reviews
+    WHERE book_id = ?
+    ORDER BY id DESC
+  `).all(req.params.id);
+  res.json(rows);
+});
+
+// Add a review for a book (new)
+app.post('/books/:id/reviews', (req, res) => {
+  const { username, stars, text } = req.body || {};
+  const s = Number(stars || 0);
+  if (!username || !s || s < 1 || s > 5) {
+    return res.status(400).json({ error: 'username and stars(1..5) required' });
+  }
+  db.prepare(`
+    INSERT INTO reviews (book_id, username, stars, text)
+    VALUES (?, ?, ?, ?)
+  `).run(req.params.id, username.trim(), s, text || null);
+
+  // Return updated book header + fresh list
+  const book = bookWithAgg.get(req.params.id);
+  const reviews = db.prepare(`
+    SELECT id, username, stars, text, created_at
+    FROM reviews
+    WHERE book_id = ?
+    ORDER BY id DESC
+  `).all(req.params.id);
+  res.status(201).json({ book, reviews });
+});
