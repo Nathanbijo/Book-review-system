@@ -4,6 +4,7 @@ import { useParams, Link } from "react-router-dom";
 import { getBook, getReviews, addReview } from "../api";
 import { getCover } from "../data/books";
 import StarRating from "../components/StarRating";
+import { AuthContext } from "../App";
 
 function pastelFromString(s) {
   let h = 0;
@@ -13,10 +14,10 @@ function pastelFromString(s) {
 
 export default function ReviewDetails() {
   const { id } = useParams();
+  const { user } = React.useContext(AuthContext);
+
   const [book, setBook] = useState(null);
   const [reviews, setReviews] = useState([]);
-
-  // form
   const [username, setUsername] = useState("");
   const [stars, setStars] = useState(0);
   const [text, setText] = useState("");
@@ -40,30 +41,29 @@ export default function ReviewDetails() {
 
   if (!book) return <div className="container"><div className="card">Loading…</div></div>;
 
+  const isAdmin = user && user.role === "admin";
+
   return (
     <div className="container details-shell">
-      {/* vertically stacked header in the middle */}
       <div className="details-banner vstack">
         <h1 className="details-title pop">{book.title}</h1>
         <p className="details-meta">{book.author} • {book.year} • {book.genre}</p>
-        <div className="orange-stars">
-          <StarRating value={book.avg_rating} />
-        </div>
+        <div className="orange-stars"><StarRating value={book.avg_rating} /></div>
         <div className="details-rating-sub">
           {book.ratings_count ? `${book.ratings_count} rating(s)` : "Be the first to rate"}
         </div>
       </div>
 
-      {/* floating cover with floating action icons that DO NOT affect layout */}
       <div className="floating-hero cover-wrap">
         <img className="details-cover-float" src={getCover(book.cover)} alt={`${book.title} cover`} />
-        <div className="cover-actions">
-          <Link className="icon-btn" to={`/edit/${book.id}`} title="Edit">✏️</Link>
-          <Link className="icon-btn danger" to={`/delete/${book.id}`} title="Delete">🗑️</Link>
-        </div>
+        {isAdmin && (
+          <div className="cover-actions">
+            <Link className="icon-btn" to={`/edit/${book.id}`} title="Edit">✏️</Link>
+            <Link className="icon-btn danger" to={`/delete/${book.id}`} title="Delete">🗑️</Link>
+          </div>
+        )}
       </div>
 
-      {/* main card starts below cover and never overlaps it */}
       <div className="card details-card lifted no-overlap titlecard-stripe">
         {book.description && (
           <div className="details-about">
