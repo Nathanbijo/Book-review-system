@@ -1,7 +1,7 @@
 // src/pages/Reviewdetails.js
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getBook, getReviews, addReview } from "../api";
+import { getBook, getReviews, addReview, mongoInsert } from "../api";
 import { getCover } from "../data/books";
 import StarRating from "../components/StarRating";
 import { AuthContext } from "../App";
@@ -21,6 +21,35 @@ export default function ReviewDetails() {
   const [username, setUsername] = useState("");
   const [stars, setStars] = useState(0);
   const [text, setText] = useState("");
+  const [mongoBusy, setMongoBusy] = useState(false);
+
+async function handleSubmitToMongo(e) {
+  e.preventDefault();
+  try {
+    setMongoBusy(true);
+    // Build a review-shaped doc for Mongo
+    const doc = {
+      kind: "review",
+      book_id: Number(id),
+      book_title: book?.title,
+      username: username || (user?.username ?? "Anonymous"),
+      stars: Number(stars) || 0,
+      text: text || null,
+      appVersion: "book-review-system v1"
+    };
+    const resp = await mongoInsert(doc);
+    if (resp?.insertedId) {
+      alert("Saved to MongoDB ✔");
+    } else {
+      alert("Mongo insert did not return an insertedId");
+    }
+  } catch (err) {
+    alert("Mongo insert failed: " + (err?.message || String(err)));
+  } finally {
+    setMongoBusy(false);
+  }
+}
+
 
   const bg = useMemo(() => pastelFromString(id || "book"), [id]);
   useEffect(() => { document.body.style.setProperty("--page-bg", bg); return () => document.body.style.removeProperty("--page-bg"); }, [bg]);
@@ -94,6 +123,16 @@ export default function ReviewDetails() {
               </div>
             </div>
             <button type="submit" className="btn gray">Submit Review</button>
+            <button
+  onClick={handleSubmitToMongo}
+  className="btn"
+  type="button"
+  disabled={mongoBusy}
+  style={{ marginLeft: 8 }}
+>
+  {mongoBusy ? "Saving…" : "Submit to MongoDB"}
+</button>
+
           </form>
         </div>
 

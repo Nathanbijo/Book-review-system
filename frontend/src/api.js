@@ -37,6 +37,12 @@ export const updBook  = (id, data) =>
   fetch(`${API}/books/${id}`, withSession({ method: "PUT", body: JSON.stringify(data) })).then(r=>r.json());
 export const delBook  = (id) =>
   fetch(`${API}/books/${id}`, withSession({ method: "DELETE" })).then(r=>r.json());
+export const mongoInsert = (payload) =>
+  fetch(`${API}/mongo/insert`, withSession({
+    method: "POST",
+    body: JSON.stringify(payload)
+  })).then(r => r.json());
+
 
 // reviews
 export const getReviews = (id) => fetch(`${API}/books/${id}/reviews`).then(r => r.json());

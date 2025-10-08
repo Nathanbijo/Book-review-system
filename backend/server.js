@@ -5,10 +5,65 @@ const Database = require('better-sqlite3');
 const path = require('path');
 const bcrypt = require('bcryptjs');
 const { v4: uuid } = require('uuid');
+const { MongoClient, ServerApiVersion } = require('mongodb'); // <-- ADD THIS
+
 
 const app = express();
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
+// ==== MONGO (simple demo insert) ==================================
+const MONGO_URL = process.env.MONGO_URL || 'mongodb://127.0.0.1:27017';
+const MONGO_DB  = process.env.MONGO_DB  || 'mwa_demo';
+
+let __mongo = null;
+async function getMongo() {
+  if (!__mongo) {
+    const client = new MongoClient(MONGO_URL, {
+      serverApi: { version: ServerApiVersion.v1, strict: true, deprecationErrors: true },
+    });
+    await client.connect();
+    const db  = client.db(MONGO_DB);
+    const col = db.collection('demo_inserts'); // simple collection
+    __mongo = { client, db, col };
+    console.log(`[mongo] connected → ${MONGO_URL}/${MONGO_DB}`);
+  }
+  return __mongo;
+}
+
+// Health check (optional)
+app.get('/mongo/health', async (_req, res) => {
+  try {
+    const { db } = await getMongo();
+    await db.command({ ping: 1 });
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: String(e.message || e) });
+  }
+});
+
+// *** The one required simple insertion API ***
+// Accept any JSON payload (so we can push review objects as-is)
+app.post('/mongo/insert', async (req, res) => {
+  try {
+    const { col } = await getMongo();
+    const payload = (req.body && typeof req.body === 'object') ? req.body : {};
+    const doc = {
+      ...payload,
+      createdAt: new Date(),
+      source: 'book-review-system'
+    };
+    const result = await col.insertOne(doc);
+    res.status(201).json({ insertedId: result.insertedId, doc });
+  } catch (e) {
+    res.status(500).json({ error: 'mongo insert failed', details: String(e.message || e) });
+  }
+});
+
+// (optional) tidy shutdown
+process.on('SIGINT', async () => {
+  if (__mongo?.client) await __mongo.client.close().catch(()=>{});
+  process.exit(0);
+});
 
 // === DB ============================================================
 const dbPath = path.join(__dirname, 'db.sqlite');
