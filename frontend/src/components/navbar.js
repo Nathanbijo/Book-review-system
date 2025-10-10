@@ -14,7 +14,9 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   const doLogout = async () => {
-    try { await logout(); } catch {}
+    try {
+      await logout();
+    } catch {}
     localStorage.removeItem("sessionId");
     setUser(null);
     navigate("/login", { replace: true });
@@ -28,12 +30,20 @@ export default function Navbar() {
       </Link>
 
       <div className="page-actions">
+        {user?.role === "admin" && (
+          <Link to="/add" className="btn" style={{ marginRight: 8 }}>
+            + Add Book
+          </Link>
+        )}
+
         {user && (
           <div className="user-chip" title={`${user.username} (${user.role})`}>
             <Avatar name={user.username} />
             <span className="user-name">{user.username}</span>
             <span className="user-role">{user.role}</span>
-            <button className="btn tiny" onClick={doLogout}>Logout</button>
+            <button className="btn tiny" onClick={doLogout}>
+              Logout
+            </button>
           </div>
         )}
       </div>
