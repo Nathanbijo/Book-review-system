@@ -5,7 +5,6 @@ import { getBook, getReviews, addReview, mongoInsert } from "../api";
 import { getCover } from "../data/books";
 import StarRating from "../components/StarRating";
 import { AuthContext } from "../App";
-useEffect(() => { document.title = "Home - Book Review System"; }, []);
 
 function pastelFromString(s) {
   let h = 0;

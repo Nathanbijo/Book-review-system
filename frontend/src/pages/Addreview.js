@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { addBook } from "../api";
-useEffect(() => { document.title = "Home - Book Review System"; }, []);
 
 function AddReview() {
   const [title, setTitle] = useState("");
@@ -9,7 +8,7 @@ function AddReview() {
   const [year, setYear] = useState("");
   const [genre, setGenre] = useState("");
   const [cover, setCover] = useState("");
-
+  useEffect(() => { document.title = "Home - Book Review System"; }, []);
   const handleSubmit = async (e) => {
     e.preventDefault();
     await addBook({ title, author, year: Number(year) || null, genre, cover, description: review });
