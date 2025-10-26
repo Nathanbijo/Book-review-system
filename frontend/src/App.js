@@ -22,6 +22,43 @@ function Protected({ children }) {
   return children;
 }
 
+function BackToTop() {
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setShow(window.scrollY > 300);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  if (!show) return null;
+
+  return (
+    <button
+      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      className="btn sm"
+      style={{
+        position: "fixed",
+        bottom: "30px",
+        right: "30px",
+        borderRadius: "50%",
+        width: "45px",
+        height: "45px",
+        fontSize: "20px",
+        boxShadow: "0 4px 12px rgba(0,0,0,.2)",
+        background: "#2563eb",
+        color: "white",
+        border: "none",
+        cursor: "pointer",
+        zIndex: 1000,
+      }}
+      title="Back to top"
+    >
+      ↑
+    </button>
+  );
+}
+
 export default function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -32,8 +69,11 @@ export default function App() {
       try {
         const { user } = await me();
         setUser(user);
-      } catch {}
-      setLoading(false);
+      } catch {
+        // user not logged in or session expired
+      } finally {
+        setLoading(false);
+      }
     })();
   }, []);
 
@@ -47,11 +87,11 @@ export default function App() {
 
         <div style={{ padding: user ? "20px" : 0 }}>
           <Routes>
-            {/* PUBLIC: Login/Signup */}
+            {/* PUBLIC: Login / Signup */}
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
 
-            {/* PRIVATE: everything else */}
+            {/* PRIVATE ROUTES */}
             <Route
               path="/"
               element={
@@ -97,6 +137,9 @@ export default function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
+
+        {/* Back to top button always available */}
+        <BackToTop />
       </Router>
     </AuthContext.Provider>
   );
