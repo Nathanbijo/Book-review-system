@@ -20,6 +20,8 @@ export default function StarRating({ value = 0, editable = false, onChange, show
           key={n}
           type="button"
           className={`star ${n <= shown ? "active" : ""}`}
+          aria-pressed={n <= shown}
+          aria-label={`${n} star${n>1?"s":""}`}
           onMouseEnter={() => editable && setHover(n)}
           onMouseLeave={() => editable && setHover(0)}
           onClick={() => editable && onChange && onChange(n)}

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { getBooks } from "../api";            // <-- uses your backend
 import { getCover } from "../data/books";     // fallback util you already have
 
+
 // small star renderer for list cards
 function Stars({ value = 0, size = 16 }) {
   const n = Math.round(Number(value || 0));
@@ -29,6 +30,7 @@ export default function Home() {
   const [q, setQ] = useState("");
   const [genre, setGenre] = useState("All");
 
+useEffect(() => { document.title = "Home - Book Review System"; }, []);
   // fetch from DB
   useEffect(() => {
     let mounted = true;
@@ -64,7 +66,7 @@ export default function Home() {
       return matchesGenre && matchesQ;
     });
   }, [books, genre, q]);
-
+  if (loading) return <div className="spinner"></div>;
   return (
     <div className="home">
       {/* Hero */}
