@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { getBooks } from "../api";            // <-- uses your backend
 import { getCover } from "../data/books";     // fallback util you already have
+useEffect(() => { document.title = "Home - Book Review System"; }, []);
 
 // small star renderer for list cards
 function Stars({ value = 0, size = 16 }) {
