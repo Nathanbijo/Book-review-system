@@ -873,3 +873,6 @@ button, .btn {
 .brand { display:flex; align-items:center; gap:10px; text-decoration:none; }
 .brand-text.xl { font-size: 28px; font-weight: 800; color:#0f172a; }
 .page-loading { padding: 40px; text-align: center; color:#334155; }
+html {
+  scroll-behavior: smooth;
+}
