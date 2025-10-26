@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { addBook } from "../api";
+useEffect(() => { document.title = "Home - Book Review System"; }, []);
 
 function AddReview() {
   const [title, setTitle] = useState("");
