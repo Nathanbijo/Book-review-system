@@ -924,3 +924,9 @@ html {
   }
 }
 html,body,#root{ background:var(--bg); color:var(--text); }
+h1{font-weight:800; letter-spacing:.2px; line-height:1.15}
+h2{font-weight:700; letter-spacing:.2px}
+h3{font-weight:600}
+.muted{color:var(--muted)}
+.dot{opacity:.5; margin:0 8px}
+.container{max-width:1160px; margin:0 auto; padding:0 16px}
