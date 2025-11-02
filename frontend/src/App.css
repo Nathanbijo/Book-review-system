@@ -1039,3 +1039,8 @@ html{ scroll-behavior:smooth }
 
 /* apply background & text */
 html,body,#root{ background:var(--bg); color:var(--text); }
+html{ scroll-behavior:smooth }
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:.01ms !important; transition-duration:.01ms !important; }
+  html{ scroll-behavior:auto }
+}
