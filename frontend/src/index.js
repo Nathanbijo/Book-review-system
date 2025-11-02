@@ -1,3 +1,8 @@
+
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+
 // Initial theme (no flash): read localStorage or system preference
 (() => {
   try {
@@ -7,10 +12,6 @@
     document.documentElement.setAttribute("data-theme", theme);
   } catch {}
 })();
-
-import React from "react";
-import ReactDOM from "react-dom/client";
-import App from "./App";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
