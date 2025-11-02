@@ -990,3 +990,5 @@ html{ scroll-behavior:smooth }
 .book-row{ display:flex; align-items:center; gap:8px; margin-top:6px }
 .book-tags{ margin-top:8px; display:flex; align-items:center; gap:8px; flex-wrap:wrap }
 .tag{ background:rgba(148,163,184,.12); border:1px solid rgba(148,163,184,.18); padding:4px 8px; border-radius:999px; font-size:.85rem }
+.stars .star{ fill:#334155; transition:fill .15s ease }
+.stars .star.on{ fill:#f59e0b }
