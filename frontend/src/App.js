@@ -13,6 +13,7 @@ import Signup from "./pages/signup";
 import { me } from "./api";
 import "./App.css";
 
+export const ThemeContext = React.createContext({ theme: "light", toggleTheme: () => {} });
 export const AuthContext = React.createContext(null);
 
 function Protected({ children }) {
@@ -60,8 +61,44 @@ function BackToTop() {
 }
 
 export default function App() {
+  const [theme, setTheme] = useState("light");
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // restore saved or system theme on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("theme");
+      if (stored) setTheme(stored);
+      else {
+        const systemDark =
+          window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        setTheme(systemDark ? "dark" : "light");
+      }
+    } catch {}
+  }, []);
+useEffect(() => {
+  const onKey = (e) => {
+    if (!e.ctrlKey && !e.metaKey && e.key.toLowerCase() === "t") {
+      toggleTheme();
+    }
+  };
+  window.addEventListener("keydown", onKey);
+  return () => window.removeEventListener("keydown", onKey);
+}, []);
+
+  // reflect theme attribute + persist
+  useEffect(() => {
+    document.documentElement.classList.add("theme-transition");
+    document.documentElement.setAttribute("data-theme", theme);
+    try {
+      localStorage.setItem("theme", theme);
+    } catch {}
+    const t = setTimeout(() => document.documentElement.classList.remove("theme-transition"), 200);
+    return () => clearTimeout(t);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
 
   // restore session on page load
   useEffect(() => {
@@ -70,7 +107,7 @@ export default function App() {
         const { user } = await me();
         setUser(user);
       } catch {
-        // user not logged in or session expired
+        // not logged in or session expired
       } finally {
         setLoading(false);
       }
@@ -81,66 +118,73 @@ export default function App() {
 
   return (
     <AuthContext.Provider value={authValue}>
-      <Router>
-        {/* Show navbar only after login */}
-        {user && <Navbar />}
+      <ThemeContext.Provider value={{ theme, toggleTheme }}>
+        <Router>
+          {/* Show navbar only after login */}
+          {user && <Navbar />}
 
-        <div style={{ padding: user ? "20px" : 0 }}>
-          <Routes>
-            {/* PUBLIC: Login / Signup */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
+          <div style={{ padding: user ? "20px" : 0 }}>
+            <Routes>
+              {/* PUBLIC: Login / Signup */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
 
-            {/* PRIVATE ROUTES */}
-            <Route
-              path="/"
-              element={
-                <Protected>
-                  <Home />
-                </Protected>
-              }
-            />
-            <Route
-              path="/review/:id"
-              element={
-                <Protected>
-                  <ReviewDetails />
-                </Protected>
-              }
-            />
-            <Route
-              path="/add"
-              element={
-                <Protected>
-                  <AddReview />
-                </Protected>
-              }
-            />
-            <Route
-              path="/edit/:id"
-              element={
-                <Protected>
-                  <EditReview />
-                </Protected>
-              }
-            />
-            <Route
-              path="/delete/:id"
-              element={
-                <Protected>
-                  <DeleteReview />
-                </Protected>
-              }
-            />
+              {/* PRIVATE ROUTES */}
+              <Route
+                path="/"
+                element={
+                  <Protected>
+                    <Home />
+                  </Protected>
+                }
+              />
+              <Route
+                path="/review/:id"
+                element={
+                  <Protected>
+                    <ReviewDetails />
+                  </Protected>
+                }
+              />
+              <Route
+                path="/add"
+                element={
+                  <Protected>
+                    <AddReview />
+                  </Protected>
+                }
+              />
+              <Route
+                path="/edit/:id"
+                element={
+                  <Protected>
+                    <EditReview />
+                  </Protected>
+                }
+              />
+              <Route
+                path="/delete/:id"
+                element={
+                  <Protected>
+                    <DeleteReview />
+                  </Protected>
+                }
+              />
 
-            {/* fallback */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </div>
+              {/* fallback */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </div>
 
-        {/* Back to top button always available */}
-        <BackToTop />
-      </Router>
+          {/* Back to top button always available */}
+          <BackToTop />
+
+          {/* SR-only announcement for theme changes */}
+          <div className="sr-only" aria-live="polite">
+            {theme === "dark" ? "Dark mode on" : "Light mode on"}
+          </div>
+        </Router>
+      </ThemeContext.Provider>
     </AuthContext.Provider>
   );
 }

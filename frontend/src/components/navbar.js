@@ -1,7 +1,7 @@
 // src/components/navbar.js
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { AuthContext } from "../App";
+import { AuthContext, ThemeContext } from "../App";
 import { logout } from "../api";
 
 function Avatar({ name = "?" }) {
@@ -11,6 +11,7 @@ function Avatar({ name = "?" }) {
 
 export default function Navbar() {
   const { user, setUser } = React.useContext(AuthContext);
+  const { theme, toggleTheme } = React.useContext(ThemeContext);
   const navigate = useNavigate();
 
   const doLogout = async () => {
@@ -41,6 +42,17 @@ export default function Navbar() {
             <Avatar name={user.username} />
             <span className="user-name">{user.username}</span>
             <span className="user-role">{user.role}</span>
+
+            <button
+              className="btn ghost"
+              onClick={toggleTheme}
+              aria-pressed={theme === "dark"}
+              title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              style={{ marginLeft: 8 }}
+            >
+              {theme === "dark" ? "🌙" : "☀️"}
+            </button>
+
             <button className="btn tiny" onClick={doLogout}>
               Logout
             </button>
