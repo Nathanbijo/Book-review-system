@@ -999,3 +999,6 @@ html{ scroll-behavior:smooth }
   border-bottom:1px solid rgba(148,163,184,.14);
   box-shadow:0 6px 24px rgba(2,6,23,.15);
 }
+.nav-link{ color:#cbd5e1; padding:10px 12px; border-radius:10px; text-decoration:none }
+.nav-link:hover{ background:rgba(148,163,184,.12) }
+.nav-link.active{ color:#fff; background:linear-gradient(180deg, rgba(37,99,235,.25), rgba(37,99,235,.12)) }
