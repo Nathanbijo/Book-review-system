@@ -1002,3 +1002,40 @@ html{ scroll-behavior:smooth }
 .nav-link{ color:#cbd5e1; padding:10px 12px; border-radius:10px; text-decoration:none }
 .nav-link:hover{ background:rgba(148,163,184,.12) }
 .nav-link.active{ color:#fff; background:linear-gradient(180deg, rgba(37,99,235,.25), rgba(37,99,235,.12)) }
+/* THEME MAPS (data-theme driven) */
+:root{
+  --gap:16px;
+  --radius:12px;
+  --shadow-sm:0 2px 8px rgba(2,6,23,.08);
+  --shadow:0 8px 24px rgba(2,6,23,.16);
+  --ring:0 0 0 3px rgba(34,211,238,.35);
+}
+
+/* Light */
+:root,[data-theme="light"]{
+  --bg:#f8fafc;
+  --card:#ffffff;
+  --text:#0f172a;
+  --muted:#475569;
+  --border:rgba(15,23,42,.12);
+  --brand:#2563eb;
+  --brand-2:#22d3ee;
+  --accent:#e5e7eb;
+  color-scheme: light;
+}
+
+/* Dark */
+[data-theme="dark"]{
+  --bg:#0b1220;
+  --card:#0f172a;
+  --text:#e5e7eb;
+  --muted:#93a3b8;
+  --border:rgba(148,163,184,.16);
+  --brand:#2563eb;
+  --brand-2:#22d3ee;
+  --accent:#111827;
+  color-scheme: dark;
+}
+
+/* apply background & text */
+html,body,#root{ background:var(--bg); color:var(--text); }
