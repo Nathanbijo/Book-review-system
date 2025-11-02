@@ -1044,3 +1044,6 @@ html{ scroll-behavior:smooth }
   *{ animation-duration:.01ms !important; transition-duration:.01ms !important; }
   html{ scroll-behavior:auto }
 }
+.container{ max-width:1160px; margin:0 auto; padding:0 16px }
+.card{ background:var(--card); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow-sm) }
+.muted{ color:var(--muted) }
