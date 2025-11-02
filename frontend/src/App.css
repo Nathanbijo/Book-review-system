@@ -992,3 +992,10 @@ html{ scroll-behavior:smooth }
 .tag{ background:rgba(148,163,184,.12); border:1px solid rgba(148,163,184,.18); padding:4px 8px; border-radius:999px; font-size:.85rem }
 .stars .star{ fill:#334155; transition:fill .15s ease }
 .stars .star.on{ fill:#f59e0b }
+.site-header{
+  position:sticky; top:0; z-index:50;
+  backdrop-filter:saturate(140%) blur(6px);
+  background:rgba(2,6,23,.55);
+  border-bottom:1px solid rgba(148,163,184,.14);
+  box-shadow:0 6px 24px rgba(2,6,23,.15);
+}
