@@ -1078,3 +1078,6 @@ input::placeholder, textarea::placeholder{ color: #94a3b8 }
 .btn.sm{ padding:6px 10px; font-size:.92rem }
 .btn.ghost{ background:transparent; color:var(--text); border-color:var(--border) }
 .btn.ghost:hover{ background:rgba(148,163,184,.10) }
+.stars .star{ fill:#475569; transition:fill .15s ease }
+[data-theme="dark"] .stars .star{ fill:#334155 }
+.stars .star.on{ fill:#f59e0b }
