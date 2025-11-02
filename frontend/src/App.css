@@ -950,3 +950,9 @@ html{ scroll-behavior:smooth }
 :where(button, [role="button"], a, input, select, textarea):focus-visible{
   outline:none; box-shadow:var(--ring);
 }
+.spinner{
+  width:44px; height:44px; border:4px solid rgba(148,163,184,.25);
+  border-top-color:var(--brand); border-radius:50%; margin:120px auto;
+  animation:spin 1s linear infinite;
+}
+@keyframes spin{ to{ transform:rotate(360deg)} }
