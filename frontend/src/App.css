@@ -1081,3 +1081,10 @@ input::placeholder, textarea::placeholder{ color: #94a3b8 }
 .stars .star{ fill:#475569; transition:fill .15s ease }
 [data-theme="dark"] .stars .star{ fill:#334155 }
 .stars .star.on{ fill:#f59e0b }
+.site-header{
+  position:sticky; top:0; z-index:50;
+  backdrop-filter:saturate(140%) blur(6px);
+  background:color-mix(in oklab, var(--bg) 70%, transparent);
+  border-bottom:1px solid var(--border);
+  box-shadow:0 6px 24px rgba(2,6,23,.12);
+}
