@@ -947,3 +947,6 @@ html{ scroll-behavior:smooth }
 .btn.sm{ padding:6px 10px; font-size:.92rem }
 .btn.ghost{ background:transparent; color:var(--text); border-color:var(--accent) }
 .btn.ghost:hover{ background:rgba(148,163,184,.08) }
+:where(button, [role="button"], a, input, select, textarea):focus-visible{
+  outline:none; box-shadow:var(--ring);
+}
