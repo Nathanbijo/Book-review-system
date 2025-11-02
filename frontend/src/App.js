@@ -77,6 +77,15 @@ export default function App() {
       }
     } catch {}
   }, []);
+useEffect(() => {
+  const onKey = (e) => {
+    if (!e.ctrlKey && !e.metaKey && e.key.toLowerCase() === "t") {
+      toggleTheme();
+    }
+  };
+  window.addEventListener("keydown", onKey);
+  return () => window.removeEventListener("keydown", onKey);
+}, []);
 
   // reflect theme attribute + persist
   useEffect(() => {
