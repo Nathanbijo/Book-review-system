@@ -1047,3 +1047,12 @@ html{ scroll-behavior:smooth }
 .container{ max-width:1160px; margin:0 auto; padding:0 16px }
 .card{ background:var(--card); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow-sm) }
 .muted{ color:var(--muted) }
+input,select,textarea{
+  background:var(--card);
+  color:var(--text);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:10px 12px;
+}
+input::placeholder, textarea::placeholder{ color: #94a3b8 }
+:where(button,a,input,select,textarea):focus-visible{ outline:none; box-shadow:var(--ring) }
