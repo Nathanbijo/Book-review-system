@@ -1069,3 +1069,12 @@ input::placeholder, textarea::placeholder{ color: #94a3b8 }
 .book-title{ margin:0 0 2px }
 .book-author{ margin:0 0 6px; color:var(--muted) }
 .tag{ background:rgba(148,163,184,.12); border:1px solid rgba(148,163,184,.20); padding:4px 8px; border-radius:999px; font-size:.85rem }
+.btn{ display:inline-flex; align-items:center; justify-content:center; gap:6px;
+  padding:10px 14px; border-radius:10px; border:1px solid transparent;
+  background:linear-gradient(180deg, var(--brand), #1d4ed8); color:#fff;
+  box-shadow:var(--shadow-sm); transition:transform .15s, box-shadow .15s; cursor:pointer; text-decoration:none }
+.btn:hover{ transform:translateY(-1px); box-shadow:var(--shadow) }
+.btn:active{ transform:translateY(0) }
+.btn.sm{ padding:6px 10px; font-size:.92rem }
+.btn.ghost{ background:transparent; color:var(--text); border-color:var(--border) }
+.btn.ghost:hover{ background:rgba(148,163,184,.10) }
