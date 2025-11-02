@@ -968,3 +968,14 @@ html{ scroll-behavior:smooth }
   padding:10px 12px; min-width:220px;
 }
 .filters label{ font-size:.85rem; color:var(--muted); display:block; margin-bottom:6px }
+.book-grid{
+  display:grid; gap:18px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+.book-card{
+  background:var(--card); border:1px solid rgba(148,163,184,.12);
+  border-radius:16px; overflow:hidden; box-shadow:var(--shadow-sm);
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s;
+  text-decoration:none; color:inherit;
+}
+.book-card:hover{ transform:translateY(-4px); box-shadow:var(--shadow); border-color:rgba(148,163,184,.2) }
