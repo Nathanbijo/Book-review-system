@@ -1101,3 +1101,8 @@ input::placeholder, textarea::placeholder{ color: #94a3b8 }
   font-size:.9rem; color:var(--muted);
   background:rgba(148,163,184,.12); padding:2px 8px; border-radius:999px;
 }
+.empty{
+  border:1px dashed var(--border);
+  color:var(--muted);
+  padding:22px; border-radius:12px; text-align:center;
+}
