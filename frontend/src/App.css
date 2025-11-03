@@ -1106,3 +1106,9 @@ input::placeholder, textarea::placeholder{ color: #94a3b8 }
   color:var(--muted);
   padding:22px; border-radius:12px; text-align:center;
 }
+.details-reviews .review{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px; padding:12px 14px; margin-bottom:12px;
+}
+.details-reviews .review .meta{ color:var(--muted) }
