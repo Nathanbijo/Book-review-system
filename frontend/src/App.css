@@ -1097,3 +1097,7 @@ input::placeholder, textarea::placeholder{ color: #94a3b8 }
   border:1px solid var(--border);
   border-radius:10px; padding:10px 12px;
 }
+.book-rating{
+  font-size:.9rem; color:var(--muted);
+  background:rgba(148,163,184,.12); padding:2px 8px; border-radius:999px;
+}
