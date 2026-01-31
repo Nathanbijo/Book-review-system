@@ -1,6 +1,3 @@
-Below is the **rewritten QuillMark README**, aligned **closely in tone, structure, and clarity** with the Waresys-style format you provided.
-It is **formal, explanatory, and accessible to both technical and non-technical readers**, suitable for **academic evaluation, GitHub, or project reports**.
-
 ---
 
 # 📚 QuillMark — Intelligent Book Review & Management System
@@ -240,12 +237,3 @@ An academic project focused on modern web application design, secure authenticat
 © 2025 — All Rights Reserved
 
 ---
-
-If you want next, I can:
-
-* 🔹 Compress this into a **2-page project report version**
-* 🔹 Rewrite it for **GitHub showcase / recruiters**
-* 🔹 Align it exactly with **IEEE / college project documentation**
-* 🔹 Add **use-case diagrams or UML explanations**
-
-Just tell me what you need 👍
