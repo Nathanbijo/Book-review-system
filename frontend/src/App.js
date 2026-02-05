@@ -79,7 +79,7 @@ export default function App() {
   }, []);
   useEffect(() => {
     const onKey = (e) => {
-      if (!e.ctrlKey && !e.metaKey && e.key.toLowerCase() === "t") {
+      if (!e.ctrlKey && !e.metaKey && (e.key || "").toLowerCase() === "t") {
         toggleTheme();
       }
     };
