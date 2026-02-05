@@ -11,6 +11,9 @@ const {
   buildCoverUrl,
 } = require('../openLibraryClient');
 
+// TODO: add caching for subject/work responses to reduce Open Library calls.
+// TODO: handle Open Library rate limits and timeouts more gracefully.
+
 // Initialize SQLite connection
 const dbPath = path.join(__dirname, '../db.sqlite');
 const db = new Database(dbPath);
@@ -59,8 +62,8 @@ router.get('/external/:olid', async (req, res) => {
       typeof work.description === 'string'
         ? work.description
         : work.description && typeof work.description.value === 'string'
-        ? work.description.value
-        : null;
+          ? work.description.value
+          : null;
     const subjects = Array.isArray(work.subjects) ? work.subjects : [];
     const year = work.first_publish_date || work.created?.value || null;
 
@@ -80,7 +83,7 @@ router.get('/external/:olid', async (req, res) => {
       reviewCount: agg.reviewCount,
     });
   } catch (err) {
-    console.error('Error in GET /books/external/:olid', err);
+    console.error(`Error in GET /books/external/${olid}:`, err);
     res.status(500).json({ error: 'Failed to fetch book details' });
   }
 });
@@ -133,7 +136,7 @@ router.get('/genre/:subject', async (req, res) => {
       books: sorted,
     });
   } catch (err) {
-    console.error('Error in GET /books/genre/:subject', err);
+    console.error(`Error in GET /books/genre/${subject}:`, err);
     res.status(500).json({ error: 'Failed to fetch genre books' });
   }
 });

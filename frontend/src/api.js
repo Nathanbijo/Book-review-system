@@ -30,13 +30,13 @@ export const me = () => fetch(`${API}/auth/me`, withSession()).then(r => r.json(
 
 // books
 export const getBooks = () => fetch(`${API}/books`).then(r => r.json());
-export const getBook  = (id) => fetch(`${API}/books/${id}`).then(r => r.json());
-export const addBook  = (data) =>
-  fetch(`${API}/books`, withSession({ method: "POST", body: JSON.stringify(data) })).then(r=>r.json());
-export const updBook  = (id, data) =>
-  fetch(`${API}/books/${id}`, withSession({ method: "PUT", body: JSON.stringify(data) })).then(r=>r.json());
-export const delBook  = (id) =>
-  fetch(`${API}/books/${id}`, withSession({ method: "DELETE" })).then(r=>r.json());
+export const getBook = (id) => fetch(`${API}/books/${id}`).then(r => r.json());
+export const addBook = (data) =>
+  fetch(`${API}/books`, withSession({ method: "POST", body: JSON.stringify(data) })).then(r => r.json());
+export const updBook = (id, data) =>
+  fetch(`${API}/books/${id}`, withSession({ method: "PUT", body: JSON.stringify(data) })).then(r => r.json());
+export const delBook = (id) =>
+  fetch(`${API}/books/${id}`, withSession({ method: "DELETE" })).then(r => r.json());
 export const mongoInsert = (payload) =>
   fetch(`${API}/mongo/insert`, withSession({
     method: "POST",
@@ -56,7 +56,7 @@ export async function fetchGenreBooks(subject, { page = 1, sort = 'popularity' }
     headers: { 'Content-Type': 'application/json' },
   });
   if (!res.ok) {
-    throw new Error(`Failed to fetch genre books: ${res.status}`);
+    throw new Error(`Failed to fetch genre books for subject "${subject}": ${res.status}`);
   }
   return res.json();
 }
@@ -66,7 +66,7 @@ export async function fetchExternalBookDetails(olid) {
     headers: { 'Content-Type': 'application/json' },
   });
   if (!res.ok) {
-    throw new Error(`Failed to fetch external book details: ${res.status}`);
+    throw new Error(`Failed to fetch external book details for OLID "${olid}": ${res.status}`);
   }
   return res.json();
 }
