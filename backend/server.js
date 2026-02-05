@@ -83,12 +83,11 @@ CREATE TABLE IF NOT EXISTS books (
 
 CREATE TABLE IF NOT EXISTS reviews (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  book_id INTEGER NOT NULL,
+  book_key TEXT NOT NULL,
   username TEXT NOT NULL,
   stars INTEGER NOT NULL,
   text TEXT,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY(book_id) REFERENCES books(id) ON DELETE CASCADE
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS ratings (
@@ -242,31 +241,31 @@ app.get('/books/:id/reviews', (req, res) => {
   const rows = db.prepare(`
     SELECT id, username, stars, text, created_at
     FROM reviews
-    WHERE book_id = ?
+    WHERE book_key = ?
     ORDER BY id DESC
   `).all(req.params.id);
   res.json(rows);
 });
 
 app.post('/books/:id/reviews', (req, res) => {
+  const bookKey = req.params.id; // Now the OLID like OL45883W
   const { username, stars, text } = req.body || {};
   const s = Number(stars || 0);
   if (!username || !s || s < 1 || s > 5) {
     return res.status(400).json({ error: 'username and stars(1..5) required' });
   }
   db.prepare(`
-    INSERT INTO reviews (book_id, username, stars, text)
+    INSERT INTO reviews (book_key, username, stars, text)
     VALUES (?, ?, ?, ?)
-  `).run(req.params.id, username.trim(), s, text || null);
+  `).run(bookKey, username.trim(), s, text || null);
 
-  const book = bookWithAgg.get(req.params.id);
   const reviews = db.prepare(`
     SELECT id, username, stars, text, created_at
     FROM reviews
-    WHERE book_id = ?
+    WHERE book_key = ?
     ORDER BY id DESC
-  `).all(req.params.id);
-  res.status(201).json({ book, reviews });
+  `).all(bookKey);
+  res.status(201).json({ reviews });
 });
 
 const PORT = process.env.PORT || 4000;
