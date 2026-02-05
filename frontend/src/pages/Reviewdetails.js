@@ -10,7 +10,7 @@ import { AuthContext } from "../App";
 function pastelFromString(s) {
   let h = 0;
   for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360;
-  return `hsl(${ h } 70 % 95 %)`;
+  return `hsl(${ h }, 70 %, 95 %)`;
 }
 
 export default function ReviewDetails() {
