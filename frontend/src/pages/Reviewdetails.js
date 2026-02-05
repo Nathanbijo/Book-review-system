@@ -1,15 +1,16 @@
+```javascript
 // src/pages/Reviewdetails.js
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { fetchExternalBookDetails, getReviews, addReview, mongoInsert } from "../api";
-import { getCover } from "../data/books";
 import StarRating from "../components/StarRating";
+import CoverImage from "../components/CoverImage";
 import { AuthContext } from "../App";
 
 function pastelFromString(s) {
   let h = 0;
   for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360;
-  return `hsl(${h} 70% 95%)`;
+  return `hsl(${ h } 70 % 95 %)`;
 }
 
 export default function ReviewDetails() {
@@ -118,16 +119,15 @@ export default function ReviewDetails() {
         <p className="details-meta">{authors} • {book.year} • {book.genre || "Genre"}</p>
         <div className="orange-stars"><StarRating value={avgRating} /></div>
         <div className="details-rating-sub">
-          {reviews.length ? `${reviews.length} rating(s)` : "Be the first to rate"}
+          {reviews.length ? `${ reviews.length } rating(s)` : "Be the first to rate"}
         </div>
       </div>
 
       <div className="floating-hero cover-wrap">
-        <img
-          className="details-cover-float"
-          src={coverUrl}
-          alt={`${title} cover`}
-          onError={(e) => { e.currentTarget.src = "/logo192.png"; }}
+        <CoverImage 
+            className="details-cover-float" 
+            coverUrl={coverUrl} 
+            title={title} 
         />
         {/* Admin/Edit actions might be legacy now, can check user role but links might point to legacy routes */}
       </div>
