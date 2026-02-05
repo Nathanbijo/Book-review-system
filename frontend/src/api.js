@@ -49,3 +49,24 @@ export const getReviews = (id) => fetch(`${API}/books/${id}/reviews`).then(r => 
 export const addReview = (id, payload) =>
   fetch(`${API}/books/${id}/reviews`, withSession({ method: "POST", body: JSON.stringify(payload) }))
     .then(r => r.json());
+// external books (Open Library)
+export async function fetchGenreBooks(subject, { page = 1, sort = 'popularity' } = {}) {
+  const params = new URLSearchParams({ page: String(page), sort });
+  const res = await fetch(`${API}/books/genre/${encodeURIComponent(subject)}?${params.toString()}`, {
+    headers: { 'Content-Type': 'application/json' },
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to fetch genre books: ${res.status}`);
+  }
+  return res.json();
+}
+
+export async function fetchExternalBookDetails(olid) {
+  const res = await fetch(`${API}/books/external/${encodeURIComponent(olid)}`, {
+    headers: { 'Content-Type': 'application/json' },
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to fetch external book details: ${res.status}`);
+  }
+  return res.json();
+}
