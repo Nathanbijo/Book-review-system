@@ -17,7 +17,7 @@ export default function Navbar() {
   const doLogout = async () => {
     try {
       await logout();
-    } catch {}
+    } catch { }
     localStorage.removeItem("sessionId");
     setUser(null);
     navigate("/login", { replace: true });
@@ -31,11 +31,11 @@ export default function Navbar() {
       </Link>
 
       <div className="page-actions">
-        {user?.role === "admin" && (
+        {/* {user?.role === "admin" && (
           <Link to="/add" className="btn" style={{ marginRight: 8 }}>
             + Add Book
           </Link>
-        )}
+        )} */}
 
         {user && (
           <div className="user-chip" title={`${user.username} (${user.role})`}>

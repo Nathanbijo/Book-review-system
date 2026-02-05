@@ -13,7 +13,7 @@ import Signup from "./pages/signup";
 import { me } from "./api";
 import "./App.css";
 
-export const ThemeContext = React.createContext({ theme: "light", toggleTheme: () => {} });
+export const ThemeContext = React.createContext({ theme: "light", toggleTheme: () => { } });
 export const AuthContext = React.createContext(null);
 
 function Protected({ children }) {
@@ -75,17 +75,17 @@ export default function App() {
           window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
         setTheme(systemDark ? "dark" : "light");
       }
-    } catch {}
+    } catch { }
   }, []);
-useEffect(() => {
-  const onKey = (e) => {
-    if (!e.ctrlKey && !e.metaKey && e.key.toLowerCase() === "t") {
-      toggleTheme();
-    }
-  };
-  window.addEventListener("keydown", onKey);
-  return () => window.removeEventListener("keydown", onKey);
-}, []);
+  useEffect(() => {
+    const onKey = (e) => {
+      if (!e.ctrlKey && !e.metaKey && e.key.toLowerCase() === "t") {
+        toggleTheme();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   // reflect theme attribute + persist
   useEffect(() => {
@@ -93,7 +93,7 @@ useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
     try {
       localStorage.setItem("theme", theme);
-    } catch {}
+    } catch { }
     const t = setTimeout(() => document.documentElement.classList.remove("theme-transition"), 200);
     return () => clearTimeout(t);
   }, [theme]);
@@ -146,6 +146,7 @@ useEffect(() => {
                   </Protected>
                 }
               />
+              {/* Legacy routes - hidden for now
               <Route
                 path="/add"
                 element={
@@ -170,6 +171,7 @@ useEffect(() => {
                   </Protected>
                 }
               />
+              */}
 
               {/* fallback */}
               <Route path="*" element={<Navigate to="/" replace />} />
