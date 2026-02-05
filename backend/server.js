@@ -7,6 +7,7 @@ const bcrypt = require('bcryptjs');
 const { v4: uuid } = require('uuid');
 const { MongoClient, ServerApiVersion } = require('mongodb'); // <-- ADD THIS
 
+const externalBooksRouter = require('./routes/externalBooks');
 
 const app = express();
 app.use(cors({ origin: true, credentials: true }));
@@ -186,6 +187,9 @@ app.post('/auth/logout', requireAuth, (req, res) => {
 app.get('/auth/me', authOptional, (req, res) => {
   res.json({ user: req.user || null });
 });
+
+// === EXTERNAL BOOKS ROUTES (Open Library) ===========================
+app.use('/books', externalBooksRouter);
 
 // === BOOK ROUTES ===================================================
 // public
