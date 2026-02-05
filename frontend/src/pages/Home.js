@@ -1,8 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getBooks } from "../api";            // <-- uses your backend
-import { getCover } from "../data/books";     // fallback util you already have
-
+import { fetchGenreBooks } from "../api";
+import { getCover } from "../data/books";
 
 // small star renderer for list cards
 function Stars({ value = 0, size = 16 }) {
@@ -24,71 +23,55 @@ function Stars({ value = 0, size = 16 }) {
   );
 }
 
+const GENRES = ["fantasy", "fiction", "romance", "science_fiction", "history", "thriller"];
+
 export default function Home() {
   const [books, setBooks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [q, setQ] = useState("");
-  const [genre, setGenre] = useState("All");
+  const [selectedGenre, setSelectedGenre] = useState("fantasy");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-useEffect(() => { document.title = "Home - Book Review System"; }, []);
-  // fetch from DB
+  useEffect(() => { document.title = "Home - Book Review System"; }, []);
+
+  // fetch from Open Library by genre
   useEffect(() => {
     let mounted = true;
-    (async () => {
+    async function load() {
+      setLoading(true);
+      setError(null);
       try {
-        const data = await getBooks();   // GET /books from backend
-        if (mounted) setBooks(Array.isArray(data) ? data : []);
-      } catch (e) {
-        if (mounted) setBooks([]);
+        const data = await fetchGenreBooks(selectedGenre, { page: 1, sort: 'popularity' });
+        if (mounted) setBooks(data.books || []);
+      } catch (err) {
+        console.error(err);
+        if (mounted) setError("Failed to load books");
       } finally {
         if (mounted) setLoading(false);
       }
-    })();
+    }
+    load();
     return () => { mounted = false; };
-  }, []);
+  }, [selectedGenre]);
 
-  // genres from fetched data
-  const genres = useMemo(() => {
-    const g = new Set(books.map((b) => b.genre).filter(Boolean));
-    return ["All", ...Array.from(g)];
-  }, [books]);
-
-  // filter + search
-  const filtered = useMemo(() => {
-    return books.filter((b) => {
-      const matchesGenre = genre === "All" || b.genre === genre;
-      const matchesQ =
-        q.trim() === "" ||
-        [b.title, b.author, b.genre, String(b.year)]
-          .join(" ")
-          .toLowerCase()
-          .includes(q.toLowerCase());
-      return matchesGenre && matchesQ;
-    });
-  }, [books, genre, q]);
-  if (loading) return <div className="spinner"></div>;
   return (
     <div className="home">
       {/* Hero */}
       <header className="home-hero">
         <h1>Browse Books</h1>
-        <p>Find something great to read. Filter by genre or search by title/author.</p>
+        <p>Find something great to read. Filter by genre from Open Library.</p>
 
         <div className="filters">
-          <div className="search">
-            <input
-              type="text"
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Search by title, author, year…"
-              aria-label="Search books"
-            />
-          </div>
           <div className="select">
             <label htmlFor="genre">Genre</label>
-            <select id="genre" value={genre} onChange={(e) => setGenre(e.target.value)}>
-              {genres.map((g) => (
-                <option key={g} value={g}>{g}</option>
+            <select
+              id="genre"
+              value={selectedGenre}
+              onChange={(e) => setSelectedGenre(e.target.value)}
+            >
+              {GENRES.map((g) => (
+                <option key={g} value={g}>
+                  {g.replace("_", " ").toUpperCase()}
+                </option>
               ))}
             </select>
           </div>
@@ -97,41 +80,49 @@ useEffect(() => { document.title = "Home - Book Review System"; }, []);
 
       {/* Grid */}
       <section className="book-grid">
-        {loading && <div className="empty">Loading…</div>}
+        {loading && <div className="spinner"></div>}
+        {error && <div className="error">{error}</div>}
 
-        {!loading && filtered.map((b) => {
-          const rating = b.avg_rating ? Number(b.avg_rating) : 0;
+        {!loading && !error && books.map((b) => {
+          // b is from Open Library: { id, title, authors: [], coverUrl, first_publish_year }
+          // Ratings might not be available yet unless we merge them, but for now we display what we have.
+          // If the backend merges ratings, we use them. If not, 0.
+          // The instruction says "Calls fetchGenreBooks... stores data.books".
+          // The backend response format for fetchGenreBooks likely includes OL fields.
+          const rating = 0; // Placeholder until we merge ratings
+          const fallbackUrl = "/logo192.png";
+
           return (
             <Link to={`/review/${b.id}`} key={b.id} className="book-card">
               <figure className="book-cover">
                 <img
-                  src={getCover(b.cover)}                 // use DB cover or fallback
-                  alt={`${b.title} cover`}
+                  src={b.coverUrl || fallbackUrl}
+                  alt={b.title}
                   loading="lazy"
-                  onError={(e) => { e.currentTarget.src = getCover(""); }}  // final safety
+                  onError={(e) => { e.currentTarget.src = fallbackUrl; }}
                 />
               </figure>
               <div className="book-meta">
                 <h3 className="book-title">{b.title}</h3>
-                <p className="book-author">{b.author}</p>
+                <p className="book-author">{b.authors?.join(", ") || "Unknown Author"}</p>
                 <div className="book-row">
                   <Stars value={rating} />
                   <span className="book-rating">
-                    {b.ratings_count ? `${rating}/5 (${b.ratings_count})` : "No ratings"}
+                    No ratings
                   </span>
                 </div>
                 <div className="book-tags">
-                  <span className="tag">{b.genre || "—"}</span>
+                  <span className="tag">{selectedGenre}</span>
                   <span className="dot">•</span>
-                  <span className="muted">{b.year || "—"}</span>
+                  <span className="muted">{b.first_publish_year || "—"}</span>
                 </div>
               </div>
             </Link>
           );
         })}
 
-        {!loading && filtered.length === 0 && (
-          <div className="empty">No books found. Try clearing filters or searching something else.</div>
+        {!loading && !error && books.length === 0 && (
+          <div className="empty">No books found.</div>
         )}
       </section>
     </div>
