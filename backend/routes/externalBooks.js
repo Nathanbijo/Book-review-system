@@ -9,6 +9,8 @@ const {
   fetchSubject,
   normalizeWorkFromSubject,
   buildCoverUrl,
+  searchWorks,
+  normalizeDocFromSearch,
 } = require('../openLibraryClient');
 
 // TODO: add caching for subject/work responses to reduce Open Library calls.
@@ -138,6 +140,50 @@ router.get('/genre/:subject', async (req, res) => {
   } catch (err) {
     console.error(`Error in GET /books/genre/${subject}:`, err);
     res.status(500).json({ error: 'Failed to fetch genre books' });
+  }
+});
+
+/**
+ * GET /books/search?q=...&page=1
+ * Search books via Open Library Search API and return normalized book cards.
+ */
+router.get('/search', async (req, res) => {
+  const q = (req.query.q || '').trim();
+  const page = parseInt(req.query.page || '1', 10);
+
+  if (!q) {
+    return res.status(400).json({ error: 'Missing q parameter' });
+  }
+
+  try {
+    const searchResult = await searchWorks(q, { page });
+    const docs = Array.isArray(searchResult.docs) ? searchResult.docs : [];
+    const normalized = docs
+      .filter(doc => doc.key)
+      .map(normalizeDocFromSearch)
+      .filter(book => book.id); // ensure we have an id
+
+    const keys = normalized.map(book => book.id);
+    const aggregates = getAggregatesForBookKeys(keys);
+
+    const enriched = normalized.map(book => {
+      const agg = aggregates[book.id] || { avgStars: null, reviewCount: 0 };
+      return {
+        ...book,
+        avgStars: agg.avgStars,
+        reviewCount: agg.reviewCount,
+      };
+    });
+
+    res.json({
+      q,
+      page,
+      numFound: searchResult.numFound || enriched.length,
+      books: enriched,
+    });
+  } catch (err) {
+    console.error('Error in GET /books/search', err);
+    res.status(500).json({ error: 'Failed to search books' });
   }
 });
 

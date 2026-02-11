@@ -70,3 +70,17 @@ export async function fetchExternalBookDetails(olid) {
   }
   return res.json();
 }
+
+export async function fetchSearchBooks(query, page = 1) {
+  const params = new URLSearchParams({
+    q: query,
+    page: String(page),
+  });
+  const res = await fetch(`${API}/books/search?${params.toString()}`, {
+    headers: { 'Content-Type': 'application/json' },
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to search books: ${res.status}`);
+  }
+  return res.json();
+}

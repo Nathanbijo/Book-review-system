@@ -29,9 +29,10 @@ async function fetchSubject(subject, { limit = 50, offset = 0 } = {}) {
 
 /**
  * Build a cover URL from available identifiers.
+ * Default size is 'L' (large). Pass size: 'M' or 'S' only for small thumbnails.
  * Order: coverId → ISBN → OLID.
  */
-function buildCoverUrl({ coverId, isbn, olid, size = 'M' }) {
+function buildCoverUrl({ coverId, isbn, olid, size = 'L' }) {
   if (coverId) {
     return `${COVERS_BASE}/b/id/${coverId}-${size}.jpg`;
   }
@@ -61,9 +62,45 @@ function normalizeWorkFromSubject(work) {
   };
 }
 
+/**
+ * Normalize a search result doc from the Search API into our internal book card shape.
+ */
+function normalizeDocFromSearch(doc) {
+  // doc.key is like "/works/OL27448W"
+  const workKey = doc.key ? doc.key.replace('/works/', '') : null;
+  const coverId = doc.cover_i || null;
+  const authors = Array.isArray(doc.author_name) ? doc.author_name : [];
+
+  return {
+    id: workKey || null,
+    title: doc.title || 'Untitled',
+    authors,
+    year: doc.first_publish_year || null,
+    coverUrl: workKey || coverId
+      ? buildCoverUrl({ coverId, olid: workKey })
+      : null,
+  };
+}
+
+// Search books by free text query using Open Library Search API.
+// See: https://openlibrary.org/dev/docs/api/search
+async function searchWorks(query, { page = 1 } = {}) {
+  const params = new URLSearchParams({
+    q: query,
+    page: String(page),
+  });
+  const res = await fetch(`${OPEN_LIBRARY_BASE}/search.json?${params.toString()}`);
+  if (!res.ok) {
+    throw new Error(`Failed to search works: ${res.status}`);
+  }
+  return res.json();
+}
+
 module.exports = {
   fetchWork,
   fetchSubject,
   buildCoverUrl,
   normalizeWorkFromSubject,
+  searchWorks,
+  normalizeDocFromSearch, // <-- add
 };

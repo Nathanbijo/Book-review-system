@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { fetchGenreBooks } from "../api";
+import { fetchGenreBooks, fetchSearchBooks } from "../api";
 import CoverImage from "../components/CoverImage";
 
 // small star renderer for list cards
@@ -28,6 +28,10 @@ const GENRES = ["fantasy", "fiction", "romance", "science_fiction", "history", "
 export default function Home() {
   const [books, setBooks] = useState([]);
   const [selectedGenre, setSelectedGenre] = useState("fantasy");
+  const [searchQuery, setSearchQuery] = useState('');
+  const [mode, setMode] = useState('genre'); // 'genre' | 'search'
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchPage, setSearchPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -53,12 +57,79 @@ export default function Home() {
     return () => { mounted = false; };
   }, [selectedGenre]);
 
+  const runSearch = async (q, page = 1) => {
+    setLoading(true);
+    setError(null);
+    setMode('search');
+    setSearchPage(page);
+
+    try {
+      const data = await fetchSearchBooks(q, page);
+      setSearchResults(data.books || []);
+    } catch (err) {
+      console.error(err);
+      setError('Failed to search books');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearchSubmit = () => {
+    const q = searchQuery.trim();
+    if (!q) {
+      setMode('genre');
+      setSearchResults([]);
+      setSearchPage(1);
+      return;
+    }
+    runSearch(q, 1);
+  };
+
+  const handleNextSearchPage = () => {
+    const q = searchQuery.trim();
+    if (!q) return;
+    const nextPage = searchPage + 1;
+    runSearch(q, nextPage);
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery('');
+    setMode('genre');
+    setSearchResults([]);
+    setSearchPage(1);
+  };
+
+  const displayBooks = mode === 'search' ? searchResults : books;
+
   return (
     <div className="home">
       {/* Hero */}
       <header className="home-hero">
         <h1>Browse Books</h1>
         <p>Find something great to read. Filter by genre from Open Library.</p>
+
+        <div className="home-search-bar">
+          <input
+            type="text"
+            placeholder="Search by title, author, or keyword..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              const key = (e.key || '').toLowerCase();
+              if (key === 'enter') {
+                handleSearchSubmit();
+              }
+            }}
+          />
+          <button type="button" onClick={handleSearchSubmit}>
+            Search
+          </button>
+          {mode === 'search' && (
+            <button type="button" onClick={handleClearSearch}>
+              Clear
+            </button>
+          )}
+        </div>
 
         <div className="filters">
           <div className="select">
@@ -83,7 +154,13 @@ export default function Home() {
         {loading && <div className="spinner"></div>}
         {error && <div className="error">{error}</div>}
 
-        {!loading && !error && books.map((b) => {
+        {mode === 'search' && (
+          <p className="home-search-info">
+            Showing search results for “{searchQuery}”
+          </p>
+        )}
+
+        {!loading && !error && displayBooks.map((b) => {
           // b is from Open Library: { id, title, authors: [], coverUrl, first_publish_year }
           const rating = b.avgStars || 0;
           // Use merged stats from backend if available, else 0
@@ -112,8 +189,16 @@ export default function Home() {
           );
         })}
 
-        {!loading && !error && books.length === 0 && (
+        {!loading && !error && displayBooks.length === 0 && (
           <div className="empty">No books found.</div>
+        )}
+
+        {mode === 'search' && !loading && searchResults.length > 0 && (
+          <div className="home-search-pagination">
+            <button type="button" onClick={handleNextSearchPage}>
+              Next page
+            </button>
+          </div>
         )}
       </section>
     </div>

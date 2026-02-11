@@ -36,12 +36,12 @@ export default function CoverImage({ coverUrl, title, className, alt }) {
 
     return (
         <div
-            className={`book-cover-fallback ${className || ''}`}
+            className="book-cover-fallback"
             style={{ backgroundColor: bg }}
             role="img"
             aria-label={alt || title}
         >
-            <span className="fallback-initials">{initials}</span>
+            <span className="book-cover-fallback__initials">{initials}</span>
         </div>
     );
 }
