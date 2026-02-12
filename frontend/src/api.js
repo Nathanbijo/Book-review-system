@@ -84,3 +84,29 @@ export async function fetchSearchBooks(query, page = 1) {
   }
   return res.json();
 }
+
+export async function fetchBookReviews(bookId) {
+  const res = await fetch(`${API}/books/${encodeURIComponent(bookId)}/reviews`, {
+    headers: { 'Content-Type': 'application/json' },
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to load reviews: ${res.status}`);
+  }
+  return res.json();
+}
+
+export async function submitBookReview(bookId, { stars, text }) {
+  const username = localStorage.getItem('username') || 'Anonymous';
+  const res = await fetch(`${API}/books/${encodeURIComponent(bookId)}/reviews`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Session-Id': localStorage.getItem('sessionId') || '',
+    },
+    body: JSON.stringify({ username, stars, text }),
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to submit review: ${res.status}`);
+  }
+  return res.json();
+}
