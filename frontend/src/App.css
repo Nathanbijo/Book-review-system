@@ -2160,4 +2160,104 @@ body {
 
 .book-cover-fallback__initials {
   text-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+} 
+ 
+/* ===== BOOK INFO PAGE STYLES ===== */
+.book-page {
+  max-width: 960px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+}
+
+.book-page-header {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.book-page-cover {
+  flex: 0 0 200px;
+}
+
+.book-page-main {
+  flex: 1;
+}
+
+.book-page-title {
+  margin: 0 0 0.5rem;
+}
+
+.book-page-authors {
+  margin: 0 0 0.5rem;
+  font-weight: 500;
+}
+
+.book-page-meta,
+.book-page-rating-summary {
+  margin: 0.25rem 0;
+  opacity: 0.85;
+}
+
+.book-page-body {
+  margin-top: 1rem;
+}
+
+.book-page-section {
+  margin-bottom: 1.5rem;
+}
+
+.book-page-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+.book-review-card {
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.8);
+  margin-bottom: 0.75rem;
+}
+
+.book-review-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.book-review-text {
+  margin: 0.25rem 0;
+}
+
+.book-review-date {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.book-review-form-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.75rem;
+}
+
+.book-review-form-row span {
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.book-review-form textarea {
+  resize: vertical;
+}
+
+.book-page.loading,
+.book-page.error {
+  max-width: 960px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+}
+
+.book-page-attribution p {
+  font-size: 0.8rem;
+  opacity: 0.7;
 }
