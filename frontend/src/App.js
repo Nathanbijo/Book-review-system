@@ -139,7 +139,7 @@ export default function App() {
                 }
               />
               <Route
-                path="/review/:id"
+                path="/books/:id"
                 element={
                   <Protected>
                     <ReviewDetails />

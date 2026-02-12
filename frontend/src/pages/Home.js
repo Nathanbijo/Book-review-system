@@ -166,7 +166,7 @@ export default function Home() {
           // Use merged stats from backend if available, else 0
 
           return (
-            <Link to={`/review/${b.id}`} key={b.id} className="book-card">
+            <Link to={`/books/${b.id}`} key={b.id} className="book-card">
               <figure className="book-cover">
                 <CoverImage coverUrl={b.coverUrl} title={b.title} />
               </figure>
