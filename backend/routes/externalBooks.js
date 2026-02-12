@@ -11,6 +11,7 @@ const {
   buildCoverUrl,
   searchWorks,
   normalizeDocFromSearch,
+  fetchEdition,
 } = require('../openLibraryClient');
 
 // TODO: add caching for subject/work responses to reduce Open Library calls.
@@ -58,6 +59,16 @@ router.get('/external/:olid', async (req, res) => {
   try {
     const work = await fetchWork(olid);
 
+    let edition = null;
+    if (Array.isArray(work.edition_key) && work.edition_key.length > 0) {
+      const firstEditionKey = work.edition_key[0]; // e.g. "OL7353617M"
+      try {
+        edition = await fetchEdition(firstEditionKey);
+      } catch (e) {
+        console.warn('Failed to fetch edition for work', olid, e.message);
+      }
+    }
+
     const coverId = Array.isArray(work.covers) ? work.covers[0] : null;
     const title = work.title || 'Untitled';
     const description =
@@ -66,9 +77,21 @@ router.get('/external/:olid', async (req, res) => {
         : work.description && typeof work.description.value === 'string'
           ? work.description.value
           : null;
-    const subjects = Array.isArray(work.subjects) ? work.subjects : [];
-    const year = work.first_publish_date || work.created?.value || null;
 
+    const subjects = Array.isArray(work.subjects) ? work.subjects : [];
+    const places = Array.isArray(work.subject_places) ? work.subject_places : [];
+    const times = Array.isArray(work.subject_times) ? work.subject_times : [];
+    const languages =
+      edition && Array.isArray(edition.languages)
+        ? edition.languages.map(l => l.key.replace('/languages/', ''))
+        : [];
+
+    const publishDate =
+      (edition && edition.publish_date) ||
+      work.first_publish_date ||
+      null;
+
+    const year = work.first_publish_date || work.created?.value || null;
     const coverUrl = buildCoverUrl({ coverId, olid });
 
     const aggregates = getAggregatesForBookKeys([olid]);
@@ -79,6 +102,10 @@ router.get('/external/:olid', async (req, res) => {
       title,
       description,
       subjects,
+      places,
+      times,
+      languages,
+      publishDate,
       year,
       coverUrl,
       avgStars: agg.avgStars,
