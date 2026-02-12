@@ -1,196 +1,221 @@
-
 // src/pages/Reviewdetails.js
-import React, { useEffect, useMemo, useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import { fetchExternalBookDetails, getReviews, addReview, mongoInsert } from "../api";
-import StarRating from "../components/StarRating";
-import CoverImage from "../components/CoverImage";
-import { AuthContext } from "../App";
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { fetchExternalBookDetails, fetchBookReviews, submitBookReview } from '../api';
+import CoverImage from '../components/CoverImage';
 
-function pastelFromString(s) {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360;
-  return `hsl(${h}, 70 %, 95 %)`;
-}
-
-export default function ReviewDetails() {
-  const { id } = useParams(); // This is now the OLID (e.g., OL123W)
-  const { user } = React.useContext(AuthContext);
-
+export default function Reviewdetails() {
+  const { id } = useParams(); // OLID
   const [book, setBook] = useState(null);
   const [reviews, setReviews] = useState([]);
-  const [username, setUsername] = useState("");
-  const [stars, setStars] = useState(0);
-  const [text, setText] = useState("");
-  const [mongoBusy, setMongoBusy] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  async function handleSubmitToMongo(e) {
-    e.preventDefault();
-    try {
-      setMongoBusy(true);
-      // Build a review-shaped doc for Mongo
-      const doc = {
-        kind: "review",
-        book_id: id,
-        book_title: book?.title,
-        username: username || (user?.username ?? "Anonymous"),
-        stars: Number(stars) || 0,
-        text: text || null,
-        appVersion: "book-review-system v1"
-      };
-      const resp = await mongoInsert(doc);
-      if (resp?.insertedId) {
-        alert("Saved to MongoDB ✔");
-      } else {
-        alert("Mongo insert did not return an insertedId");
-      }
-    } catch (err) {
-      alert("Mongo insert failed: " + (err?.message || String(err)));
-    } finally {
-      setMongoBusy(false);
-    }
-  }
+  // Review form state
+  const [newStars, setNewStars] = useState(0);
+  const [newText, setNewText] = useState('');
 
-  const bg = useMemo(() => pastelFromString(id || "book"), [id]);
-  useEffect(() => { document.body.style.setProperty("--page-bg", bg); return () => document.body.style.removeProperty("--page-bg"); }, [bg]);
-
+  // Load book details and reviews on mount
   useEffect(() => {
+    let cancelled = false;
+
     async function load() {
       setLoading(true);
       setError(null);
       try {
-        const [bookData, reviewsData] = await Promise.all([
+        const [bookData, reviewData] = await Promise.all([
           fetchExternalBookDetails(id),
-          getReviews(id)
+          fetchBookReviews(id),
         ]);
-        setBook(bookData);
-        setReviews(reviewsData);
+        if (!cancelled) {
+          setBook(bookData);
+          setReviews(reviewData || []);
+        }
       } catch (err) {
         console.error(err);
-        setError("Failed to load book details");
+        if (!cancelled) {
+          setError('Failed to load book information');
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
+
     load();
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
-  const submitReview = async (e) => {
+  // Review submission handler
+  const handleSubmitReview = async (e) => {
     e.preventDefault();
-    if (!username || !stars) { alert("Please add your name and a star rating."); return; }
-    // POST to /books/:id/reviews using OLID
-    const { reviews: updatedList } = await addReview(id, { username, stars, text });
-    setReviews(updatedList);
-    setUsername(""); setStars(0); setText("");
-    // Note: addReview returns { book, reviews }, but since 'book' is now external, 
-    // we probably just rely on the API returning reviews or re-fetching.
-    // The existing api method adds a review and returns updated data.
-    // If backend logic for `addReview` updates a 'local' book, it might be irrelevant now,
-    // but returning reviews is key.
+    if (!newStars) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      await submitBookReview(id, { stars: newStars, text: newText });
+      const updated = await fetchBookReviews(id);
+      setReviews(updated || []);
+      setNewStars(0);
+      setNewText('');
+    } catch (err) {
+      console.error(err);
+      setError('Failed to submit review');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  if (loading) return <div className="container"><div className="card">Loading…</div></div>;
-  if (error) return <div className="container"><div className="error">{error}</div></div>;
-  if (!book) return <div className="container"><div className="card">Book not found</div></div>;
+  // Loading and error states
+  if (loading) {
+    return <div className="book-page loading">Loading book information…</div>;
+  }
 
-  const title = book.title;
-  const authors = Array.isArray(book.authors) ? book.authors.join(", ") : (book.authors || "Unknown Author");
-  const coverUrl = book.coverUrl || "/logo192.png";
-  // If backend external details includes 'description' as string or object
-  const description = typeof book.description === 'object' ? book.description?.value : book.description;
-  const avgRating = book.avg_rating || 0;
-  // Note: Open Library might not give us our local rating average easily unless we mix it in.
-  // For now, we display mostly static data or if `getReviews` or `bookData` includes it.
+  if (error) {
+    return <div className="book-page error">{error}</div>;
+  }
 
-  // Check if we need to merge local rating info. 
-  // If `getReviews` returns reviews, we can calculate local rating on the fly if needed,
-  // or rely on what `fetchExternalBookDetails` gave us (if it merged it). 
-  // The user prompt implies `fetchExternalBookDetails` just gets data.
-  // Let's compute average from reviews if `book.avg_rating` is missing?
-  // Existing `book` object had `avg_rating`.
-  // I'll use what's available.
+  if (!book) {
+    return <div className="book-page error">Book not found.</div>;
+  }
 
+  // Render book info page
   return (
-    <div className="container details-shell">
-      <div className="details-banner vstack">
-        <h1 className="details-title pop">{title}</h1>
-        <p className="details-meta">{authors} • {book.year} • {book.genre || "Genre"}</p>
-        <div className="orange-stars"><StarRating value={avgRating} /></div>
-        <div className="details-rating-sub">
-          {reviews.length ? `${reviews.length} rating(s)` : "Be the first to rate"}
+    <div className="book-page">
+      {/* Book header section */}
+      <div className="book-page-header">
+        <div className="book-page-cover">
+          <CoverImage coverUrl={book.coverUrl} title={book.title} />
+        </div>
+        <div className="book-page-main">
+          <h1 className="book-page-title">{book.title}</h1>
+          {book.authors && book.authors.length > 0 && (
+            <p className="book-page-authors">
+              {book.authors.join(', ')}
+            </p>
+          )}
+          {book.publishDate && (
+            <p className="book-page-meta">
+              First published {book.publishDate}
+            </p>
+          )}
+          <p className="book-page-rating-summary">
+            {book.avgStars != null ? `${book.avgStars.toFixed(1)}★` : 'No ratings yet'} ·{' '}
+            {book.reviewCount || 0} review{(book.reviewCount || 0) === 1 ? '' : 's'}
+          </p>
         </div>
       </div>
 
-      <div className="floating-hero cover-wrap">
-        <CoverImage
-          className="details-cover-float"
-          coverUrl={coverUrl}
-          title={title}
-        />
-        {/* Admin/Edit actions might be legacy now, can check user role but links might point to legacy routes */}
-      </div>
-
-      <div className="card details-card lifted no-overlap titlecard-stripe">
-        {description && (
-          <div className="details-about">
-            <h3>About this book</h3>
-            <p>{description}</p>
-          </div>
+      <div className="book-page-body">
+        {/* Description section */}
+        {book.description && (
+          <section className="book-page-section">
+            <h2>About this book</h2>
+            <p className="book-page-description">{book.description}</p>
+          </section>
         )}
 
-        <div className="details-form">
-          <h3>Add your review</h3>
-          <form onSubmit={submitReview}>
-            <div className="form-row">
-              <div className="form-col">
-                <label>Username</label>
-                <input value={username} onChange={e => setUsername(e.target.value)} placeholder="Your name" required />
+        {/* Metadata section */}
+        <section className="book-page-section">
+          <h2>Details</h2>
+          <div className="book-page-details-grid">
+            {book.publishDate && (
+              <div>
+                <h3>Published</h3>
+                <p>{book.publishDate}</p>
               </div>
-              <div className="form-col">
-                <label>Your rating</label>
-                <div className="orange-stars">
-                  <StarRating value={stars} editable onChange={setStars} />
-                </div>
+            )}
+            {book.languages && book.languages.length > 0 && (
+              <div>
+                <h3>Languages</h3>
+                <p>{book.languages.join(', ')}</p>
               </div>
+            )}
+            {book.subjects && book.subjects.length > 0 && (
+              <div>
+                <h3>Subjects</h3>
+                <p>{book.subjects.slice(0, 8).join(', ')}</p>
+              </div>
+            )}
+            {book.places && book.places.length > 0 && (
+              <div>
+                <h3>Places</h3>
+                <p>{book.places.join(', ')}</p>
+              </div>
+            )}
+            {book.times && book.times.length > 0 && (
+              <div>
+                <h3>Times</h3>
+                <p>{book.times.join(', ')}</p>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Reviews list section */}
+        <section className="book-page-section">
+          <h2>Reader reviews</h2>
+          {reviews.length === 0 && <p>No reviews yet. Be the first to review this book.</p>}
+          {reviews.map((rev) => (
+            <div key={rev.id} className="book-review-card">
+              <div className="book-review-header">
+                <span className="book-review-user">{rev.username}</span>
+                <span className="book-review-stars">{'★'.repeat(rev.stars)}{'☆'.repeat(5 - rev.stars)}</span>
+              </div>
+              {rev.text && <p className="book-review-text">{rev.text}</p>}
+              {rev.created_at && (
+                <p className="book-review-date">
+                  {new Date(rev.created_at).toLocaleDateString()}
+                </p>
+              )}
             </div>
-            <div className="form-row">
-              <div className="form-col full">
-                <label>Your review</label>
-                <textarea rows={4} value={text} onChange={e => setText(e.target.value)} placeholder="Share what you liked..." />
-              </div>
-            </div>
-            <button type="submit" className="btn gray">Submit Review</button>
-            <button
-              onClick={handleSubmitToMongo}
-              className="btn"
-              type="button"
-              disabled={mongoBusy}
-              style={{ marginLeft: 8 }}
-            >
-              {mongoBusy ? "Saving…" : "Submit to MongoDB"}
+          ))}
+        </section>
+
+        {/* Review submission form */}
+        <section className="book-page-section">
+          <h2>Write a review</h2>
+          <form className="book-review-form" onSubmit={handleSubmitReview}>
+            <label className="book-review-form-row">
+              <span>Rating</span>
+              <select
+                value={newStars}
+                onChange={(e) => setNewStars(Number(e.target.value))}
+              >
+                <option value={0}>Select...</option>
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <option key={n} value={n}>{n} star{n === 1 ? '' : 's'}</option>
+                ))}
+              </select>
+            </label>
+            <label className="book-review-form-row">
+              <span>Your thoughts (optional)</span>
+              <textarea
+                value={newText}
+                onChange={(e) => setNewText(e.target.value)}
+                rows={4}
+                placeholder="What did you think about this book?"
+              />
+            </label>
+            <button type="submit" disabled={submitting || !newStars}>
+              {submitting ? 'Submitting…' : 'Submit review'}
             </button>
-
           </form>
-        </div>
+        </section>
 
-        <div className="details-reviews">
-          <h3>What readers say</h3>
-          {reviews.length === 0 && <p className="muted">No reviews yet.</p>}
-          <ul className="review-list">
-            {reviews.map(r => (
-              <li key={r.id} className="review-item">
-                <div className="review-date">{new Date(r.created_at).toLocaleString()}</div>
-                {r.text && <p className="review-text italic bigger">{r.text}</p>}
-                <div className="review-user italic">- {r.username}</div>
-                <div className="review-stars orange-stars">
-                  <StarRating value={r.stars} showLabel={false} />
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
+        {/* Open Library attribution */}
+        <section className="book-page-section book-page-attribution">
+          <p>
+            Book data from{' '}
+            <a href={`https://openlibrary.org/works/${book.id}`} target="_blank" rel="noreferrer">
+              Open Library
+            </a>.
+          </p>
+        </section>
       </div>
     </div>
   );
