@@ -96,11 +96,20 @@ async function searchWorks(query, { page = 1 } = {}) {
   return res.json();
 }
 
+async function fetchEdition(olid) {
+  const res = await fetch(`${OPEN_LIBRARY_BASE}/books/${olid}.json`);
+  if (!res.ok) {
+    throw new Error(`Failed to fetch edition ${olid}: ${res.status}`);
+  }
+  return res.json();
+}
+
 module.exports = {
   fetchWork,
   fetchSubject,
   buildCoverUrl,
   normalizeWorkFromSubject,
   searchWorks,
-  normalizeDocFromSearch, // <-- add
+  normalizeDocFromSearch,
+  fetchEdition, // <-- add
 };
